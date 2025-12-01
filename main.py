@@ -6,7 +6,7 @@ COURSE_TO_DETECT = [
     # 'INDENG_120',
     # 'BIOENG_100',
     # 'UGBA_152',
-    'CS_177',
+    'CS_185',
 ]
 
 def check_course_availability(course_name):
