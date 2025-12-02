@@ -3,7 +3,7 @@ import json
 import sys
 from courses.base_course import BaseCourse
 
-class CS185(BaseCourse):
+class CS_185(BaseCourse):
     """
     Different than other implementations, this class aims to find total open seats for the
     lecture section of CS177. Aims to find total open seat < 10;
