@@ -13,20 +13,39 @@ class CS_185(BaseCourse):
 
     def parse_html(self, html):
         soup = BeautifulSoup(html, 'html.parser')
-        data_element = soup.find(attrs={'data-enrollment': True})
-        if data_element:
-            return self.extract_data(data_element['data-enrollment'])
-        else:
-            print("Could not find the required element on the page.")
+
+        # Find the big JSON blob
+        script_tag = soup.find('script', attrs={
+            'type': 'application/json',
+            'data-drupal-selector': 'drupal-settings-json'
+        })
+        if not script_tag:
+            print("Could not find drupal settings JSON.")
             sys.exit(1)
 
+        settings = json.loads(script_tag.string)
+
+        # Drill into the JSON to get the "available" object
+        enrollment = settings.get('ucb', {}).get('enrollment', {})
+        available = enrollment.get('available', {})
+        if not available:
+            print("Could not find 'available' enrollment data in JSON.")
+            sys.exit(1)
+
+        # Re-use your existing helper
+        total_open_seats = self.calculate_total_open_seats(available)
+        is_available = total_open_seats > 30  # tweak threshold as you like
+
+        message = f"CS185 Lecture has {total_open_seats} open seats."
+        return self.extract_data(json.dumps({'available': available}))
+    
     def extract_data(self, data_json):
         try:
             data = json.loads(data_json)
             # enrolled = data.get('available', {}).get('enrollmentStatus', {}).get('enrolledCount', 0)
             total_open_seats = self.calculate_total_open_seats(data.get('available', {}))
             available = total_open_seats > 30
-            message = f"CS185 Lecture has {total_open_seats} seats opened!. It's less than 10 now!!!"
+            message = f"CS185 Lecture has {total_open_seats} seats opened!"
             return available, message
         except json.JSONDecodeError as e:
             print(f"Failed to parse JSON: {e}")
