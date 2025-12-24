@@ -34,7 +34,7 @@ class CS_185(BaseCourse):
 
         # Re-use your existing helper
         total_open_seats = self.calculate_total_open_seats(available)
-        is_available = total_open_seats > 30  # tweak threshold as you like
+        is_available = total_open_seats > 60  # tweak threshold as you like
 
         message = f"CS185 Lecture has {total_open_seats} open seats."
         return self.extract_data(json.dumps({'available': available}))
@@ -44,7 +44,7 @@ class CS_185(BaseCourse):
             data = json.loads(data_json)
             # enrolled = data.get('available', {}).get('enrollmentStatus', {}).get('enrolledCount', 0)
             total_open_seats = self.calculate_total_open_seats(data.get('available', {}))
-            available = total_open_seats > 30
+            available = total_open_seats > 60
             message = f"CS185 Lecture has {total_open_seats} seats opened!"
             return available, message
         except json.JSONDecodeError as e:
